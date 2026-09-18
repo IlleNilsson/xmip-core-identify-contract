@@ -1,12 +1,6 @@
 # xmip-core-identify-contract
 
-Identify by contract: reads the identity the content's contract names: ISA06, UNB S002, MSH-3; a message-layer identifier whose claim is detected. A technology of
-[xmip-core-identify](https://github.com/IlleNilsson/xmip-core-identify).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `MessageIdentifier`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Identify by contract: reads the Party the contract the first section is bound to names as its sender, detected and unproven. A technology of [xmip-core-identify](https://github.com/IlleNilsson/xmip-core-identify).
 
 ## Toolchain
 
