@@ -4,7 +4,7 @@
 //! names as its sender.
 //!
 //! A contract is agreed with somebody. When a Message's first section has
-//! been bound to `partner-x-orders-v2`, the binding itself says who is on the
+//! been bound to `party-x-orders-v2`, the binding itself says who is on the
 //! other side of it, and this identifier reads that: the contract-to-Party
 //! mapping is configured into it, and the Party the bound contract maps to is
 //! the claim. It is *detected* — read out of what is there — and it proves
@@ -110,25 +110,25 @@ mod tests {
 
     fn identifier() -> Contract {
         Contract::new([
-            ("partner-x-orders-v2", "partner-x"),
-            ("partner-y-invoices", "partner-y"),
+            ("party-x-orders-v2", "party-x"),
+            ("party-y-invoices", "party-y"),
         ])
     }
 
     #[test]
     fn the_party_the_bound_contract_names_is_presented_as_a_detected_claim() {
         let claim = identifier()
-            .identify(&message(Some("partner-x-orders-v2")))
+            .identify(&message(Some("party-x-orders-v2")))
             .expect("read")
             .expect("a claim");
 
-        assert_eq!(claim.value, "partner-x");
+        assert_eq!(claim.value, "party-x");
         assert_eq!(claim.established, Established::Detected);
         assert_eq!(claim.layer(), Layer::Message);
         assert_eq!(claim.mechanism.name(), "contract");
         assert_eq!(
             claim.evidence,
-            vec![(CONTRACT.to_string(), "partner-x-orders-v2".to_string())]
+            vec![(CONTRACT.to_string(), "party-x-orders-v2".to_string())]
         );
     }
 
