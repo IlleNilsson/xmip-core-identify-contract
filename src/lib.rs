@@ -10,11 +10,11 @@
 //! the claim. It is *detected* — read out of what is there — and it proves
 //! nothing: a contract binding is a statement about the content's shape, and
 //! anyone who can produce the shape can produce the binding. Whether a Party
-//! recognised only this way may send this contract is authorization's
+//! recognized only this way may send this contract is authorization's
 //! question (ADR-0050 section 5, `authorize/contract`).
 //!
 //! A section bound to no contract, or to one the mapping does not name,
-//! carries nothing this identifier recognises. The evidence names the
+//! carries nothing this identifier recognizes. The evidence names the
 //! contract, so the record says which binding the claim came from:
 //!
 //! ```text
