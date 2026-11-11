@@ -1,25 +1,18 @@
 #![forbid(unsafe_code)]
 
-//! Identify by contract: the Party the contract the first section is bound to
-//! names as its sender.
+//! Identify by contract: the Contract the first section is bound to, read
+//! out of what is there and proving nothing.
 //!
-//! A contract is agreed with somebody. When a Message's first section has
-//! been bound to `party-x-orders-v2`, the binding itself says who is on the
-//! other side of it, and this identifier reads that: the contract-to-Party
-//! mapping is configured into it, and the Party the bound contract maps to is
-//! the claim. It is *detected* — read out of what is there — and it proves
-//! nothing: a contract binding is a statement about the content's shape, and
-//! anyone who can produce the shape can produce the binding. Whether a Party
-//! recognized only this way may send this contract is authorization's
-//! question (ADR-0050 section 5, `authorize/contract`).
+//! A binding is a statement about the content's shape, and anyone who can
+//! produce the shape can produce the binding, so it names no Party: the
+//! claim is the Contract's name, *detected*. Who the content is from is what
+//! its sender proved (the owner, 2026-11-10: a Party only from what the
+//! sender proved). Where a Contract is agreed with a Party, `authorize/contract`
+//! compares that Party with the one the sender proved and refuses another,
+//! once (ADR-0019, amendment 2026-11-11; ADR-0050 section 5).
 //!
-//! A section bound to no contract, or to one the mapping does not name,
-//! carries nothing this identifier recognizes. The evidence names the
-//! contract, so the record says which binding the claim came from:
-//!
-//! ```text
-//! contract.name   the contract the first section is bound to   evidence
-//! ```
+//! A section bound to no contract carries nothing this identifier
+//! recognizes; a binding with no name is an error, not an absence.
 //!
 //! The interchange senders ADR-0050 lists beside this leaf — ISA06, UNB S002,
 //! MSH-3 — are promoted by the EDI and HL7 content technologies and read by
@@ -30,36 +23,9 @@ use identify::{IdentifyError, MessageIdentifier, Presented};
 use message::Message;
 use xcore::Mechanism;
 
-/// The evidence name carrying the contract the claim was read from.
-pub const CONTRACT: &str = "contract.name";
-
-/// Reads the Party the bound contract names, from a configured mapping.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
-pub struct Contract {
-    parties: Vec<(String, String)>,
-}
-
-impl Contract {
-    /// A mapping of contract name to the Party it is agreed with.
-    #[must_use]
-    pub fn new(parties: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>) -> Self {
-        Self {
-            parties: parties
-                .into_iter()
-                .map(|(contract, party)| (contract.into(), party.into()))
-                .collect(),
-        }
-    }
-
-    /// The Party `contract` is agreed with, where the mapping names one.
-    #[must_use]
-    pub fn party(&self, contract: &str) -> Option<&str> {
-        self.parties
-            .iter()
-            .find(|(candidate, _)| candidate == contract)
-            .map(|(_, party)| party.as_str())
-    }
-}
+/// Reads the Contract the first section is bound to.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct Contract;
 
 impl MessageIdentifier for Contract {
     fn mechanism(&self) -> Mechanism {
@@ -80,9 +46,7 @@ impl MessageIdentifier for Contract {
             ));
         }
 
-        Ok(self.party(contract).map(|party| {
-            Presented::detected(self.mechanism(), party).with_evidence(CONTRACT, contract)
-        }))
+        Ok(Some(Presented::detected(self.mechanism(), contract)))
     }
 }
 
@@ -108,55 +72,28 @@ mod tests {
         )
     }
 
-    fn identifier() -> Contract {
-        Contract::new([
-            ("party-x-orders-v2", "party-x"),
-            ("party-y-invoices", "party-y"),
-        ])
-    }
-
     #[test]
-    fn the_party_the_bound_contract_names_is_presented_as_a_detected_claim() {
-        let claim = identifier()
+    fn the_bound_contract_is_a_detected_claim_and_names_no_party() {
+        let claim = Contract
             .identify(&message(Some("party-x-orders-v2")))
             .expect("read")
             .expect("a claim");
 
-        assert_eq!(claim.value, "party-x");
+        assert_eq!(claim.value, "party-x-orders-v2");
         assert_eq!(claim.established, Established::Detected);
         assert_eq!(claim.layer(), Layer::Message);
         assert_eq!(claim.mechanism.name(), "contract");
-        assert_eq!(
-            claim.evidence,
-            vec![(CONTRACT.to_string(), "party-x-orders-v2".to_string())]
-        );
+        assert!(claim.evidence.is_empty(), "{:?}", claim.evidence);
     }
 
     #[test]
     fn a_section_bound_to_no_contract_presents_nothing() {
-        assert!(
-            identifier()
-                .identify(&message(None))
-                .expect("read")
-                .is_none()
-        );
-    }
-
-    #[test]
-    fn a_contract_the_mapping_does_not_name_presents_nothing() {
-        // The binding is real; it just names nobody this node knows. Not an
-        // error: the contract may be one agreed with no Party in particular.
-        assert!(
-            identifier()
-                .identify(&message(Some("public-price-list")))
-                .expect("read")
-                .is_none()
-        );
+        assert!(Contract.identify(&message(None)).expect("read").is_none());
     }
 
     #[test]
     fn a_binding_without_a_name_is_an_error_and_not_an_absence() {
-        let failure = identifier()
+        let failure = Contract
             .identify(&message(Some("  ")))
             .expect_err("no name");
 
@@ -172,6 +109,6 @@ mod tests {
             MessageTreatment::default(),
         );
 
-        assert!(identifier().identify(&message).expect("read").is_none());
+        assert!(Contract.identify(&message).expect("read").is_none());
     }
 }

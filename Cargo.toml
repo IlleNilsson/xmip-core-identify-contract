@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2024"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/IlleNilsson/xmip-core-identify-contract"
-description = "Identify by contract: reads the Party the contract the first section is bound to names as its sender, detected and unproven. A xmip-core-identify technology."
+description = "Identify by contract: the Contract the first section is bound to, a detected claim that names no Party. A xmip-core-identify technology."
 publish = false
 
 [lib]
