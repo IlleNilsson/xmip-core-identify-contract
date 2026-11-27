@@ -9,11 +9,6 @@ where a Contract is agreed with a Party, `xmip-core-authorize-contract`
 compares that Party with the one the sender proved and refuses another
 (the owner, 2026-11-10; ADR-0019, amendment 2026-11-11).
 
-## Toolchain
-
-`rust-toolchain.toml` pins the toolchain for the whole estate. Do not change it
-here.
-
 ## Verification
 
 `cargo test`: four tests — the bound Contract is a detected claim naming no
