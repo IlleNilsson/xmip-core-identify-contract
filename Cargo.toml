@@ -14,14 +14,14 @@ path = "src/lib.rs"
 # A Technology depends on its parent Capability, never the reverse
 # (repository-model.md). The mechanism is xmip-core's, declared once; the
 # Message is the Foundation's.
-identify = { package = "xmip-core-identify", git = "https://github.com/IlleNilsson/xmip-core-identify", branch = "main" }
-xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core", branch = "main" }
-message = { package = "xmip-core-message", git = "https://github.com/IlleNilsson/xmip-core-message", branch = "main" }
+identify = { workspace = true }
+xcore = { workspace = true }
+message = { workspace = true }
 
 [dev-dependencies]
 # The context and Stream a Message is built over, for the tests only.
-context = { package = "xmip-core-context", git = "https://github.com/IlleNilsson/xmip-core-context", branch = "main" }
-stream = { package = "xmip-core-stream", git = "https://github.com/IlleNilsson/xmip-core-stream", branch = "main" }
+context = { workspace = true }
+stream = { workspace = true }
 
 [lints]
 workspace = true
